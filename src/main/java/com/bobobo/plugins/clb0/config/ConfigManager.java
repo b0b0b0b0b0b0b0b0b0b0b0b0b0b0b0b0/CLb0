@@ -62,6 +62,10 @@ public class ConfigManager {
         return config.getBoolean("debug", true);
     }
 
+    public boolean isCheckUpdate() {
+        return config.getBoolean("check-update", true);
+    }
+
     public List<String> getBypassPlayers() {
         List<String> bypassList = config.getStringList("bypass-players");
         if (bypassList == null) {

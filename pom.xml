@@ -6,7 +6,7 @@
 
   <groupId>com.bobobo.plugins</groupId>
   <artifactId>CLb0</artifactId>
-  <version>1.0</version>
+  <version>1.1</version>
   <packaging>jar</packaging>
 
   <name>CLb0</name>
@@ -58,6 +58,14 @@
           <id>sonatype</id>
           <url>https://oss.sonatype.org/content/groups/public/</url>
       </repository>
+      <repository>
+          <id>codemc-releases</id>
+          <url>https://repo.codemc.io/repository/maven-releases/</url>
+      </repository>
+      <repository>
+          <id>codemc-snapshots</id>
+          <url>https://repo.codemc.io/repository/maven-snapshots/</url>
+      </repository>
   </repositories>
 
   <dependencies>
@@ -65,6 +73,12 @@
           <groupId>com.destroystokyo.paper</groupId>
           <artifactId>paper-api</artifactId>
           <version>1.16.5-R0.1-SNAPSHOT</version>
+          <scope>provided</scope>
+      </dependency>
+      <dependency>
+          <groupId>com.github.retrooper</groupId>
+          <artifactId>packetevents-spigot</artifactId>
+          <version>2.11.1</version>
           <scope>provided</scope>
       </dependency>
   </dependencies>

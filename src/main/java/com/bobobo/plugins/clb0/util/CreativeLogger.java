@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Level;
 
 public class CreativeLogger {
@@ -25,7 +26,8 @@ public class CreativeLogger {
     private final LogEntryFormatter formatter;
     private final LogRotationConfig rotationConfig;
     private final boolean debug;
-    private final Map<String, LogFileManager> fileManagers;
+    private final Map<UUID, LogFileManager> fileManagers;
+    private LogFileManager defaultFileManager;
 
     public CreativeLogger(CLb plugin, ConfigManager configManager) {
         this.plugin = plugin;
@@ -34,6 +36,14 @@ public class CreativeLogger {
         this.formatter = new LogEntryFormatter(configManager.getLogFormat(), configManager.getDateFormat());
         this.rotationConfig = configManager.getLogRotationConfig();
         this.fileManagers = new HashMap<>();
+
+        if (!configManager.isLogByPlayer()) {
+            String logFilePath = configManager.getLogFile();
+            File logFile = new File(plugin.getDataFolder(), logFilePath);
+            LogRotator rotator = new LogRotator(rotationConfig.getMaxFileSizeBytes());
+            LogCompressor compressor = new LogCompressor();
+            defaultFileManager = new LogFileManager(logFile, rotator, compressor);
+        }
     }
 
     public boolean isDebug() {
@@ -42,38 +52,14 @@ public class CreativeLogger {
 
     private LogFileManager getFileManagerForPlayer(Player player) {
         if (!configManager.isLogByPlayer()) {
-            String defaultKey = "default";
-            return fileManagers.computeIfAbsent(defaultKey, k -> {
-                String logFilePath = configManager.getLogFile();
-                File logFile = new File(plugin.getDataFolder(), logFilePath);
-                LogRotator rotator = new LogRotator(rotationConfig.getMaxFileSizeBytes());
-                LogCompressor compressor = new LogCompressor();
-                return new LogFileManager(logFile, rotator, compressor);
-            });
+            return defaultFileManager;
         }
 
-        String playerIdentifier;
-        String format = configManager.getLogPlayerFormat();
-        
-        if (format.equalsIgnoreCase("uuid")) {
-            playerIdentifier = player.getUniqueId().toString();
-        } else {
-            playerIdentifier = player.getName();
-        }
-
-        return fileManagers.computeIfAbsent(playerIdentifier, k -> {
+        UUID uuid = player.getUniqueId();
+        return fileManagers.computeIfAbsent(uuid, k -> {
             String logFilePath = configManager.getLogFile();
-            String fileName = logFilePath;
-            
-            int lastDot = fileName.lastIndexOf('.');
-            if (lastDot > 0) {
-                String name = fileName.substring(0, lastDot);
-                String extension = fileName.substring(lastDot);
-                fileName = name + "-" + playerIdentifier + extension;
-            } else {
-                fileName = fileName + "-" + playerIdentifier;
-            }
-
+            String playerId = configManager.getLogPlayerFormat().equals("uuid") ? uuid.toString() : player.getName();
+            String fileName = logFilePath.replace("{player}", playerId);
             File logFile = new File(plugin.getDataFolder(), fileName);
             LogRotator rotator = new LogRotator(rotationConfig.getMaxFileSizeBytes());
             LogCompressor compressor = new LogCompressor();
@@ -83,38 +69,40 @@ public class CreativeLogger {
 
     public void logCreativeItem(Player player, ItemStack item) {
         if (debug) {
-            plugin.getLogger().info("DEBUG [CreativeLogger] logCreativeItem called - Player: " + player.getName() + 
-                " Item: " + (item != null ? item.getType() : "null"));
+            plugin.getLogger().info(" ");
+            plugin.getLogger().info("\u001B[36mlogCreativeItem called - Player: " + player.getName() +
+                " Item: " + (item != null ? item.getType() : "null") + "\u001B[0m");
+            plugin.getLogger().info(" ");
         }
-        
+
         if (!configManager.isEnabled()) {
             if (debug) {
-                plugin.getLogger().info("DEBUG [CreativeLogger] Plugin disabled in config");
+                plugin.getLogger().info("\u001B[33mPlugin disabled in config\u001B[0m");
             }
             return;
         }
 
         if (configManager.isPlayerBypassed(player.getName())) {
             if (debug) {
-                plugin.getLogger().info("DEBUG [CreativeLogger] Player " + player.getName() + " is bypassed");
+                plugin.getLogger().info("\u001B[33mPlayer " + player.getName() + " is bypassed\u001B[0m");
             }
             return;
         }
 
         if (item == null || item.getType() == Material.AIR) {
             if (debug) {
-                plugin.getLogger().info("DEBUG [CreativeLogger] Item is null or AIR");
+                plugin.getLogger().info("\u001B[33mItem is null or AIR\u001B[0m");
             }
             return;
         }
 
         LogFileManager fileManager = getFileManagerForPlayer(player);
         File logFile = fileManager.getCurrentLogFile();
-        
+
         if (debug) {
-            plugin.getLogger().info("DEBUG [CreativeLogger] Log file path: " + logFile.getAbsolutePath());
+            plugin.getLogger().info("\u001B[36mLog file path: " + logFile.getAbsolutePath() + "\u001B[0m");
         }
-        
+
         long currentSize = logFile.length();
 
         if (rotationConfig.isEnabled()) {
@@ -129,13 +117,14 @@ public class CreativeLogger {
 
         String logEntry = formatter.format(player, item);
         if (debug) {
-            plugin.getLogger().info("DEBUG [CreativeLogger] Log entry: " + logEntry);
+            plugin.getLogger().info("\u001B[36mLog entry: " + logEntry + "\u001B[0m");
         }
 
         try (PrintWriter writer = new PrintWriter(new FileWriter(logFile, true))) {
             writer.println(logEntry);
             if (debug) {
-                plugin.getLogger().info("DEBUG [CreativeLogger] Successfully wrote to log file");
+                plugin.getLogger().info("\u001B[32mSuccessfully wrote to log file\u001B[0m");
+                plugin.getLogger().info(" ");
             }
         } catch (IOException e) {
             plugin.getLogger().log(Level.SEVERE, "Failed to write to log file", e);

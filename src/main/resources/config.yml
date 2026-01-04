@@ -19,6 +19,12 @@ enabled: true
 #    false = disable debug logs
 debug: false
 
+# Enable automatic version checking on plugin startup
+# The plugin will check for updates from the server and notify you in the console
+#    true = check for updates
+#    false = do not check
+check-update: true
+
 # ===============================
 #    Logging Settings
 # ===============================
