@@ -1,0 +1,4 @@
+name: CLb0
+version: '${project.version}'
+main: com.bobobo.plugins.clb0.CLb
+api-version: '1.16'

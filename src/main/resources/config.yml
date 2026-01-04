@@ -1,0 +1,75 @@
+# ===============================
+#       Plugin Settings
+# ===============================
+
+# Language selection for plugin messages
+# Possible values:
+#   "en" for English
+#   "ru" для Русского
+lang: ru
+
+# Enable or disable the plugin
+#    true = plugin is enabled
+#    false = plugin is disabled
+enabled: true
+
+# Enable debug logging to server console
+# When enabled, plugin will log detailed debug information
+#    true = enable debug logs
+#    false = disable debug logs
+debug: false
+
+# ===============================
+#    Logging Settings
+# ===============================
+
+# Path to the log file (relative to plugin folder)
+# The log file will be created in the plugin's data folder
+log-file: "logs/creative-items.log"
+
+# Format of log entries
+# Available placeholders:
+#   {date} - date and time
+#   {player} - player name
+#   {item} - item name
+#   {amount} - item amount
+log-format: "[{date}] {player} took {item} x{amount} from creative menu"
+
+# Date format for log entries
+# Uses Java SimpleDateFormat syntax
+date-format: "yyyy-MM-dd HH:mm:ss"
+
+# ===============================
+#    Bypass Settings
+# ===============================
+
+# List of players who will not be logged
+# Players in this list can use creative mode without being logged
+# Add player names (case-insensitive)
+bypass-players:
+  - "ExamplePlayer"
+
+# ===============================
+#    Log Rotation Settings
+# ===============================
+
+rotation:
+  # Enable or disable log rotation
+  # When enabled, old log files will be rotated when they reach the maximum size
+  #    true = enable rotation
+  #    false = disable rotation
+  enabled: true
+
+  # Maximum file size in megabytes before rotation
+  # When the log file reaches this size, it will be rotated
+  max-file-size-mb: 10
+
+  # Maximum number of log files to keep
+  # Oldest files will be deleted when this limit is reached
+  max-files: 5
+
+  # Compress old log files using GZIP compression
+  # Compressed files will have .gz extension
+  #    true = compress old logs
+  #    false = keep logs uncompressed
+  compress-old-logs: true
