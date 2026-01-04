@@ -1,5 +1,6 @@
 package com.bobobo.plugins.clb0;
 
+import com.bobobo.plugins.clb0.command.CLbCommand;
 import com.bobobo.plugins.clb0.config.ConfigManager;
 import com.bobobo.plugins.clb0.config.LanguageManager;
 import com.bobobo.plugins.clb0.listener.CreativeListener;
@@ -18,6 +19,10 @@ public final class CLb extends JavaPlugin {
         creativeLogger = new CreativeLogger(this, configManager);
 
         getServer().getPluginManager().registerEvents(new CreativeListener(creativeLogger, this), this);
+
+        CLbCommand command = new CLbCommand(configManager, languageManager);
+        getCommand("clb0").setExecutor(command);
+        getCommand("clb0").setTabCompleter(command);
     }
 
     @Override
