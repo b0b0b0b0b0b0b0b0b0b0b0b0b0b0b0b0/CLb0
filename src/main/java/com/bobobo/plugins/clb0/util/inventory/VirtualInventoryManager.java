@@ -3,7 +3,7 @@ package com.bobobo.plugins.clb0.util.inventory;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -19,11 +19,11 @@ public class VirtualInventoryManager {
     private final Map<UUID, Integer> lastRemoveSlots;
 
     public VirtualInventoryManager() {
-        this.virtualInvs = new HashMap<>();
-        this.firstPacketTime = new HashMap<>();
-        this.lastRemovedItems = new HashMap<>();
-        this.lastRemoveTimes = new HashMap<>();
-        this.lastRemoveSlots = new HashMap<>();
+        this.virtualInvs = new IdentityHashMap<>();
+        this.firstPacketTime = new IdentityHashMap<>();
+        this.lastRemovedItems = new IdentityHashMap<>();
+        this.lastRemoveTimes = new IdentityHashMap<>();
+        this.lastRemoveSlots = new IdentityHashMap<>();
     }
 
     public ItemStack[] getVirtualInventory(UUID uuid) {

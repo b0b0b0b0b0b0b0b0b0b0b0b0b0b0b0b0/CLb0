@@ -15,7 +15,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -35,7 +35,7 @@ public class CreativeLogger {
         this.debug = configManager.isDebug();
         this.formatter = new LogEntryFormatter(configManager.getLogFormat(), configManager.getDateFormat());
         this.rotationConfig = configManager.getLogRotationConfig();
-        this.fileManagers = new HashMap<>();
+        this.fileManagers = new IdentityHashMap<>();
 
         if (!configManager.isLogByPlayer()) {
             String logFilePath = configManager.getLogFile();

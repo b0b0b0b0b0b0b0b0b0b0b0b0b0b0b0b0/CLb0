@@ -23,7 +23,8 @@ public class LogFileManager {
         ensureParentDirectoryExists();
         if (!logFile.exists()) {
             try {
-                logFile.createNewFile();
+                if (!logFile.createNewFile()) {
+                }
             } catch (IOException e) {
             }
         }
@@ -33,7 +34,9 @@ public class LogFileManager {
         ensureParentDirectoryExists();
         if (!logFile.exists()) {
             try {
-                logFile.createNewFile();
+                if (!logFile.createNewFile()) {
+                    throw new RuntimeException("Failed to create log file - file already exists");
+                }
             } catch (IOException e) {
                 throw new RuntimeException("Failed to create log file", e);
             }
@@ -63,14 +66,16 @@ public class LogFileManager {
         if (compressEnabled) {
             File compressedFile = compressor.getCompressedFileName(rotatedFile);
             if (compressor.compressFile(rotatedFile, compressedFile)) {
-                rotatedFile.delete();
+                if (!rotatedFile.delete()) {
+                }
             }
         }
 
         cleanupOldFiles(maxFiles, compressEnabled);
         
         try {
-            logFile.createNewFile();
+            if (!logFile.createNewFile()) {
+            }
         } catch (IOException e) {
         }
     }
@@ -102,7 +107,8 @@ public class LogFileManager {
         Arrays.sort(logFiles, Comparator.comparingLong(File::lastModified).reversed());
 
         for (int i = maxFiles - 1; i < logFiles.length; i++) {
-            logFiles[i].delete();
+            if (!logFiles[i].delete()) {
+            }
         }
     }
 

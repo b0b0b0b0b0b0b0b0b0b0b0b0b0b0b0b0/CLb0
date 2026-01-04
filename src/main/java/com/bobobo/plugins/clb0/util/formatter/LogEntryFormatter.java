@@ -9,17 +9,15 @@ import java.util.Date;
 public class LogEntryFormatter {
     private final String format;
     private final SimpleDateFormat dateFormat;
-    private final ItemNameFormatter itemNameFormatter;
 
     public LogEntryFormatter(String format, String dateFormatPattern) {
         this.format = format;
         this.dateFormat = new SimpleDateFormat(dateFormatPattern);
-        this.itemNameFormatter = new ItemNameFormatter();
     }
 
     public String format(Player player, ItemStack item) {
         String date = dateFormat.format(new Date());
-        String itemName = itemNameFormatter.format(item);
+        String itemName = ItemNameFormatter.format(item);
         int amount = item.getAmount();
 
         return format

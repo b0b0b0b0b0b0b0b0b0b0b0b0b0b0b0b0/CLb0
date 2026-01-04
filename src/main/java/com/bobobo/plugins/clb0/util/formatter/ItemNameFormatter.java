@@ -3,8 +3,11 @@ package com.bobobo.plugins.clb0.util.formatter;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-public class ItemNameFormatter {
-    public String format(ItemStack item) {
+public final class ItemNameFormatter {
+    private ItemNameFormatter() {
+    }
+
+    public static String format(ItemStack item) {
         if (item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
             return item.getItemMeta().getDisplayName();
         }
