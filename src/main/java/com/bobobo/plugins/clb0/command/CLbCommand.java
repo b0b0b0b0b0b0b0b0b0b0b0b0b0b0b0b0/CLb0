@@ -22,8 +22,7 @@ public class CLbCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0) {
-            sender.sendMessage(languageManager.getMessage("usage"));
-            return true;
+            return false;
         }
 
         if (args[0].equalsIgnoreCase("reload")) {
@@ -39,8 +38,7 @@ public class CLbCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        sender.sendMessage(languageManager.getMessage("usage"));
-        return true;
+        return false;
     }
 
     @Override
