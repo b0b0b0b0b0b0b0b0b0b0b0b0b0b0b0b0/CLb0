@@ -15,15 +15,17 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 
 public class CreativeLogger {
     private final CLb plugin;
     private final ConfigManager configManager;
     private final LogEntryFormatter formatter;
-    private final LogFileManager fileManager;
     private final LogRotationConfig rotationConfig;
     private final boolean debug;
+    private final Map<String, LogFileManager> fileManagers;
 
     public CreativeLogger(CLb plugin, ConfigManager configManager) {
         this.plugin = plugin;
@@ -31,17 +33,52 @@ public class CreativeLogger {
         this.debug = configManager.isDebug();
         this.formatter = new LogEntryFormatter(configManager.getLogFormat(), configManager.getDateFormat());
         this.rotationConfig = configManager.getLogRotationConfig();
-
-        String logFilePath = configManager.getLogFile();
-        File logFile = new File(plugin.getDataFolder(), logFilePath);
-
-        LogRotator rotator = new LogRotator(rotationConfig.getMaxFileSizeBytes());
-        LogCompressor compressor = new LogCompressor();
-        this.fileManager = new LogFileManager(logFile, rotator, compressor);
+        this.fileManagers = new HashMap<>();
     }
 
     public boolean isDebug() {
         return debug;
+    }
+
+    private LogFileManager getFileManagerForPlayer(Player player) {
+        if (!configManager.isLogByPlayer()) {
+            String defaultKey = "default";
+            return fileManagers.computeIfAbsent(defaultKey, k -> {
+                String logFilePath = configManager.getLogFile();
+                File logFile = new File(plugin.getDataFolder(), logFilePath);
+                LogRotator rotator = new LogRotator(rotationConfig.getMaxFileSizeBytes());
+                LogCompressor compressor = new LogCompressor();
+                return new LogFileManager(logFile, rotator, compressor);
+            });
+        }
+
+        String playerIdentifier;
+        String format = configManager.getLogPlayerFormat();
+        
+        if (format.equalsIgnoreCase("uuid")) {
+            playerIdentifier = player.getUniqueId().toString();
+        } else {
+            playerIdentifier = player.getName();
+        }
+
+        return fileManagers.computeIfAbsent(playerIdentifier, k -> {
+            String logFilePath = configManager.getLogFile();
+            String fileName = logFilePath;
+            
+            int lastDot = fileName.lastIndexOf('.');
+            if (lastDot > 0) {
+                String name = fileName.substring(0, lastDot);
+                String extension = fileName.substring(lastDot);
+                fileName = name + "-" + playerIdentifier + extension;
+            } else {
+                fileName = fileName + "-" + playerIdentifier;
+            }
+
+            File logFile = new File(plugin.getDataFolder(), fileName);
+            LogRotator rotator = new LogRotator(rotationConfig.getMaxFileSizeBytes());
+            LogCompressor compressor = new LogCompressor();
+            return new LogFileManager(logFile, rotator, compressor);
+        });
     }
 
     public void logCreativeItem(Player player, ItemStack item) {
@@ -71,10 +108,13 @@ public class CreativeLogger {
             return;
         }
 
+        LogFileManager fileManager = getFileManagerForPlayer(player);
         File logFile = fileManager.getCurrentLogFile();
+        
         if (debug) {
             plugin.getLogger().info("DEBUG [CreativeLogger] Log file path: " + logFile.getAbsolutePath());
         }
+        
         long currentSize = logFile.length();
 
         if (rotationConfig.isEnabled()) {

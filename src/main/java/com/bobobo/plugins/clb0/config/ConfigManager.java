@@ -38,6 +38,14 @@ public class ConfigManager {
         return config.getString("log-file", "logs/creative-items.log");
     }
 
+    public boolean isLogByPlayer() {
+        return config.getBoolean("log-by-player", true);
+    }
+
+    public String getLogPlayerFormat() {
+        return config.getString("log-player-format", "uuid");
+    }
+
     public String getLogFormat() {
         return config.getString("log-format", "[{date}] {player} took {item} x{amount} from creative menu");
     }
@@ -51,7 +59,7 @@ public class ConfigManager {
     }
 
     public boolean isDebug() {
-        return config.getBoolean("debug", false);
+        return config.getBoolean("debug", true);
     }
 
     public List<String> getBypassPlayers() {

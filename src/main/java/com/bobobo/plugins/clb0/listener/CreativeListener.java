@@ -31,21 +31,21 @@ public class CreativeListener implements Listener {
             return;
         }
 
-        ItemStack clicked = event.getCurrentItem();
         ItemStack cursor = event.getCursor();
 
+        if (cursor == null || cursor.getType() == org.bukkit.Material.AIR) {
+            return;
+        }
+
         if (creativeLogger.isDebug()) {
-            plugin.getLogger().info("DEBUG [CreativeListener] Player: " + player.getName() + 
-                " Cursor: " + (cursor != null ? cursor.getType() : "null") + 
-                " Clicked: " + (clicked != null ? clicked.getType() : "null"));
+            plugin.getLogger().info("DEBUG [CreativeListener] Event triggered - Player: " + player.getName() + 
+                " | Cursor: " + cursor.getType() + 
+                " | Amount: " + cursor.getAmount() +
+                " | RawSlot: " + event.getRawSlot() +
+                " | TopSize: " + event.getView().getTopInventory().getSize() +
+                " | Current: " + (event.getCurrentItem() != null ? event.getCurrentItem().getType() : "null"));
         }
 
-        if (cursor != null && cursor.getType() != org.bukkit.Material.AIR) {
-            creativeLogger.logCreativeItem(player, cursor.clone());
-        }
-
-        if (clicked != null && clicked.getType() != org.bukkit.Material.AIR) {
-            creativeLogger.logCreativeItem(player, clicked.clone());
-        }
+        creativeLogger.logCreativeItem(player, cursor.clone());
     }
 }

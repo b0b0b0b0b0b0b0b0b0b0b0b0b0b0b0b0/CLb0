@@ -25,7 +25,20 @@ debug: false
 
 # Path to the log file (relative to plugin folder)
 # The log file will be created in the plugin's data folder
+# If log-by-player is enabled, {player} will be replaced with player name/UUID
 log-file: "logs/creative-items.log"
+
+# Store logs in separate files per player
+# When enabled, each player will have their own log file
+#    true = separate file for each player
+#    false = all logs in one file
+log-by-player: true
+
+# Player identifier format when log-by-player is enabled
+# Possible values:
+#   "nick" - use player name (e.g. creative-items-PlayerName.log)
+#   "uuid" - use player UUID (e.g. creative-items-uuid.log)
+log-player-format: "uuid"
 
 # Format of log entries
 # Available placeholders:
