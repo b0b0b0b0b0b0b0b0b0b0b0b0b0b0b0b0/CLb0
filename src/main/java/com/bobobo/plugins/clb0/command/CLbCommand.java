@@ -25,80 +25,82 @@ public class CLbCommand implements CommandExecutor, TabCompleter {
             return false;
         }
 
-        if (args[0].equalsIgnoreCase("reload")) {
-            if (!sender.hasPermission("clb0.reload")) {
-                sender.sendMessage(languageManager.getMessage("no-permission"));
-                return true;
-            }
+        String commandName = args[0].toLowerCase();
 
-            configManager.loadConfig();
-            languageManager.reload();
-
-            sender.sendMessage(languageManager.getMessage("plugin-reloaded"));
-            return true;
-        }
-
-        if (args[0].equalsIgnoreCase("bypass")) {
-            if (!sender.hasPermission("clb0.bypass")) {
-                sender.sendMessage(languageManager.getMessage("no-permission"));
-                return true;
-            }
-
-            if (args.length < 2) {
-                sender.sendMessage(languageManager.getMessage("bypass-usage"));
-                return true;
-            }
-
-            String subCommand = args[1].toLowerCase();
-
-            if (subCommand.equals("add")) {
-                if (args.length < 3) {
-                    sender.sendMessage(languageManager.getMessage("bypass-add-usage"));
+        switch (commandName) {
+            case "reload":
+                if (!sender.hasPermission("clb0.reload")) {
+                    sender.sendMessage(languageManager.getMessage("no-permission"));
                     return true;
                 }
 
-                String playerName = args[2];
-                if (configManager.addBypassPlayer(playerName)) {
-                    sender.sendMessage(languageManager.getMessage("bypass-added").replace("{player}", playerName));
-                } else {
-                    sender.sendMessage(languageManager.getMessage("bypass-already-exists").replace("{player}", playerName));
-                }
+                configManager.loadConfig();
+                languageManager.reload();
+                sender.sendMessage(languageManager.getMessage("plugin-reloaded"));
                 return true;
-            }
 
-            if (subCommand.equals("remove")) {
-                if (args.length < 3) {
-                    sender.sendMessage(languageManager.getMessage("bypass-remove-usage"));
+            case "bypass":
+                if (!sender.hasPermission("clb0.bypass")) {
+                    sender.sendMessage(languageManager.getMessage("no-permission"));
                     return true;
                 }
 
-                String playerName = args[2];
-                if (configManager.removeBypassPlayer(playerName)) {
-                    sender.sendMessage(languageManager.getMessage("bypass-removed").replace("{player}", playerName));
-                } else {
-                    sender.sendMessage(languageManager.getMessage("bypass-not-found").replace("{player}", playerName));
+                if (args.length < 2) {
+                    sender.sendMessage(languageManager.getMessage("bypass-usage"));
+                    return true;
                 }
-                return true;
-            }
 
-            if (subCommand.equals("list")) {
-                List<String> bypassList = configManager.getBypassPlayers();
-                if (bypassList.isEmpty()) {
-                    sender.sendMessage(languageManager.getMessage("bypass-list-empty"));
-                } else {
-                    sender.sendMessage(languageManager.getMessage("bypass-list-header"));
-                    for (String player : bypassList) {
-                        sender.sendMessage("  - " + player);
-                    }
+                String subCommand = args[1].toLowerCase();
+
+                switch (subCommand) {
+                    case "add":
+                        if (args.length < 3) {
+                            sender.sendMessage(languageManager.getMessage("bypass-add-usage"));
+                            return true;
+                        }
+
+                        String playerName = args[2];
+                        if (configManager.addBypassPlayer(playerName)) {
+                            sender.sendMessage(languageManager.getMessage("bypass-added").replace("{player}", playerName));
+                        } else {
+                            sender.sendMessage(languageManager.getMessage("bypass-already-exists").replace("{player}", playerName));
+                        }
+                        return true;
+
+                    case "remove":
+                        if (args.length < 3) {
+                            sender.sendMessage(languageManager.getMessage("bypass-remove-usage"));
+                            return true;
+                        }
+
+                        playerName = args[2];
+                        if (configManager.removeBypassPlayer(playerName)) {
+                            sender.sendMessage(languageManager.getMessage("bypass-removed").replace("{player}", playerName));
+                        } else {
+                            sender.sendMessage(languageManager.getMessage("bypass-not-found").replace("{player}", playerName));
+                        }
+                        return true;
+
+                    case "list":
+                        List<String> bypassList = configManager.getBypassPlayers();
+                        if (bypassList.isEmpty()) {
+                            sender.sendMessage(languageManager.getMessage("bypass-list-empty"));
+                        } else {
+                            sender.sendMessage(languageManager.getMessage("bypass-list-header"));
+                            for (String player : bypassList) {
+                                sender.sendMessage("  - " + player);
+                            }
+                        }
+                        return true;
+
+                    default:
+                        sender.sendMessage(languageManager.getMessage("bypass-usage"));
+                        return true;
                 }
-                return true;
-            }
 
-            sender.sendMessage(languageManager.getMessage("bypass-usage"));
-            return true;
+            default:
+                return false;
         }
-
-        return false;
     }
 
     @Override
