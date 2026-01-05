@@ -98,4 +98,61 @@ public class ConfigManager {
 
         return new LogRotationConfig(enabled, maxFileSizeBytes, maxFiles, compressOldLogs);
     }
+
+    public boolean addBypassPlayer(String playerName) {
+        if (playerName == null || playerName.trim().isEmpty()) {
+            return false;
+        }
+
+        List<String> bypassList = getBypassPlayers();
+        String lowerName = playerName.toLowerCase();
+
+        for (String bypassPlayer : bypassList) {
+            if (bypassPlayer != null && bypassPlayer.toLowerCase().equals(lowerName)) {
+                return false;
+            }
+        }
+
+        bypassList.add(playerName);
+        config.set("bypass-players", bypassList);
+        return saveConfig();
+    }
+
+    public boolean removeBypassPlayer(String playerName) {
+        if (playerName == null || playerName.trim().isEmpty()) {
+            return false;
+        }
+
+        List<String> bypassList = getBypassPlayers();
+        String lowerName = playerName.toLowerCase();
+        boolean removed = false;
+
+        List<String> newList = new ArrayList<>();
+        for (String bypassPlayer : bypassList) {
+            if (bypassPlayer != null && !bypassPlayer.toLowerCase().equals(lowerName)) {
+                newList.add(bypassPlayer);
+            } else {
+                removed = true;
+            }
+        }
+
+        if (removed) {
+            config.set("bypass-players", newList);
+            return saveConfig();
+        }
+
+        return false;
+    }
+
+    private boolean saveConfig() {
+        try {
+            plugin.saveConfig();
+            plugin.reloadConfig();
+            config = plugin.getConfig();
+            return true;
+        } catch (Exception e) {
+            plugin.getLogger().severe("Failed to save config: " + e.getMessage());
+            return false;
+        }
+    }
 }

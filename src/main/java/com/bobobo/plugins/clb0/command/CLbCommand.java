@@ -38,6 +38,66 @@ public class CLbCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
+        if (args[0].equalsIgnoreCase("bypass")) {
+            if (!sender.hasPermission("clb0.bypass")) {
+                sender.sendMessage(languageManager.getMessage("no-permission"));
+                return true;
+            }
+
+            if (args.length < 2) {
+                sender.sendMessage(languageManager.getMessage("bypass-usage"));
+                return true;
+            }
+
+            String subCommand = args[1].toLowerCase();
+
+            if (subCommand.equals("add")) {
+                if (args.length < 3) {
+                    sender.sendMessage(languageManager.getMessage("bypass-add-usage"));
+                    return true;
+                }
+
+                String playerName = args[2];
+                if (configManager.addBypassPlayer(playerName)) {
+                    sender.sendMessage(languageManager.getMessage("bypass-added").replace("{player}", playerName));
+                } else {
+                    sender.sendMessage(languageManager.getMessage("bypass-already-exists").replace("{player}", playerName));
+                }
+                return true;
+            }
+
+            if (subCommand.equals("remove")) {
+                if (args.length < 3) {
+                    sender.sendMessage(languageManager.getMessage("bypass-remove-usage"));
+                    return true;
+                }
+
+                String playerName = args[2];
+                if (configManager.removeBypassPlayer(playerName)) {
+                    sender.sendMessage(languageManager.getMessage("bypass-removed").replace("{player}", playerName));
+                } else {
+                    sender.sendMessage(languageManager.getMessage("bypass-not-found").replace("{player}", playerName));
+                }
+                return true;
+            }
+
+            if (subCommand.equals("list")) {
+                List<String> bypassList = configManager.getBypassPlayers();
+                if (bypassList.isEmpty()) {
+                    sender.sendMessage(languageManager.getMessage("bypass-list-empty"));
+                } else {
+                    sender.sendMessage(languageManager.getMessage("bypass-list-header"));
+                    for (String player : bypassList) {
+                        sender.sendMessage("  - " + player);
+                    }
+                }
+                return true;
+            }
+
+            sender.sendMessage(languageManager.getMessage("bypass-usage"));
+            return true;
+        }
+
         return false;
     }
 
@@ -48,8 +108,26 @@ public class CLbCommand implements CommandExecutor, TabCompleter {
             if (sender.hasPermission("clb0.reload")) {
                 completions.add("reload");
             }
+            if (sender.hasPermission("clb0.bypass")) {
+                completions.add("bypass");
+            }
             return completions;
         }
+
+        if (args.length == 2 && args[0].equalsIgnoreCase("bypass") && sender.hasPermission("clb0.bypass")) {
+            List<String> completions = new ArrayList<>();
+            completions.add("add");
+            completions.add("remove");
+            completions.add("list");
+            return completions;
+        }
+
+        if (args.length == 3 && args[0].equalsIgnoreCase("bypass") && sender.hasPermission("clb0.bypass")) {
+            if (args[1].equalsIgnoreCase("remove")) {
+                return new ArrayList<>(configManager.getBypassPlayers());
+            }
+        }
+
         return new ArrayList<>();
     }
 }

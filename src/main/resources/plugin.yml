@@ -12,3 +12,6 @@ permissions:
   clb0.reload:
     description: Allows reloading the CLb0 plugin configuration
     default: op
+  clb0.bypass:
+    description: Allows managing bypass players list
+    default: op
